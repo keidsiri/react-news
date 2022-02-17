@@ -62,6 +62,16 @@ handleEditingPostInList = (postToEdit) => {
   });
 }
 
+
+handleLike = (id) => {
+  let selectedPost = this.state.mainPostList.find(post => post.id === id);
+  selectedPost.like++;
+  
+  const newMainPostList = this.state.mainPostList.map((post)=> {return post.id === id ? selectedPost : post});
+  this.setState({mainPostList: newMainPostList});
+}
+  
+
 handleEditClick = () => {
   console.log("handleEditClick reached!");
   this.setState({editing: true});
@@ -89,7 +99,8 @@ handleEditClick = () => {
       buttonText = "Return to Post List";
     } else {
       currentlyVisibleState = <PostList postList={this.state.mainPostList} 
-      onPostSelection={this.handleChangingSelectedPost}/>
+      onPostSelection={this.handleChangingSelectedPost} onLikeClicked = {this.handleLike}/>
+      
       buttonText = "Add Post";
     }
     return (

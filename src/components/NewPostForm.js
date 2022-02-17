@@ -11,6 +11,7 @@ function NewPostForm(props) {
       headline: event.target.headline.value, 
       textArea: event.target.textArea.value, 
       author: event.target.author.value, 
+      like: event.target.like.value,
       id: v4()
     });
   }
