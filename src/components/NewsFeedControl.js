@@ -2,6 +2,7 @@ import React from "react";
 import NewPostForm from "./NewPostForm";
 import PostList from './PostList'
 import PostDetail from './PostDetail';
+import EditPostForm from './EditPostForm';
 
 
 class NewsFeedControl extends React.Component {
@@ -11,7 +12,7 @@ class NewsFeedControl extends React.Component {
       formVisibleOnPage: false,
       mainPostList: [],
       selectedPost: null,
-      //editing: false
+      editing: false
     }
   }
 
@@ -19,7 +20,8 @@ handleClick = () => {
   if (this.state.selectedPost != null) {
     this.setState({
       formVisibleOnPage: false,
-      selectedPost: null
+      selectedPost: null,
+      editing: false
     });
   } else {
     this.setState(prevState => ({
@@ -41,18 +43,53 @@ handleChangingSelectedPost = (id) => {
   this.setState({selectedPost: selectedPost});
 }
 
+handleDeletingPost = (id) => {
+  const newMainPostList = this.state.mainPostList.filter(post => post.id !== id);//creating a new main post list without the deleted post
+  this.setState({
+    mainPostList: newMainPostList,
+    selectedPost: null
+  });
+}
+
+handleEditingPostInList = (postToEdit) => {
+  const editedMainPostList = this.state.mainPostList
+    .filter(post => post.id !== this.state.selectedPost.id)
+    .concat(postToEdit);
+  this.setState({
+    mainPostList: editedMainPostList,
+    editing: false,
+    selectedPost: null
+  });
+}
+
+handleEditClick = () => {
+  console.log("handleEditClick reached!");
+  this.setState({editing: true});
+}
+
   render(){
     let currentlyVisibleState = null;
     let buttonText = null;
     
-    if (this.state.selectedPost != null) {  //if we click on one of the posts then it's going to select that post(by id) and show the details
-      currentlyVisibleState = <PostDetail post = {this.state.selectedPost} />
-      buttonText = "Return to News feed"
+    if (this.state.editing) {
+      currentlyVisibleState = <EditPostForm 
+        post = {this.state.selectedPost} 
+        onEditPost = {this.handleEditingPostInList} />
+        buttonText = "Return to Post List";
+    } else if (this.state.selectedPost != null) {  //if we click on one of the posts then it's going to select that post(by id) and show the details
+      currentlyVisibleState =
+      <PostDetail 
+        post = {this.state.selectedPost} 
+        onClickingDelete = {this.handleDeletingPost}
+        onClickingEdit = {this.handleEditClick}/>
+        buttonText = "Return to News feed"
     } else if (this.state.formVisibleOnPage) {
-      currentlyVisibleState = <NewPostForm onNewPostCreation={this.handleAddingNewPostToList}/>
+      currentlyVisibleState = <NewPostForm 
+      onNewPostCreation={this.handleAddingNewPostToList}/>
       buttonText = "Return to Post List";
     } else {
-      currentlyVisibleState = <PostList postList={this.state.mainPostList} onPostSelection={this.handleChangingSelectedPost}/>
+      currentlyVisibleState = <PostList postList={this.state.mainPostList} 
+      onPostSelection={this.handleChangingSelectedPost}/>
       buttonText = "Add Post";
     }
     return (
